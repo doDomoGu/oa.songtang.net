@@ -10,6 +10,11 @@ class Position extends \yii\db\ActiveRecord
     public $childrenIds;
     public $childrenList;
 
+    public static function getDb()
+    {
+        return Yii::$app->db2;
+    }
+
 
     public function rules()
     {
