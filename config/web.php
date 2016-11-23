@@ -3,19 +3,20 @@
 $params = require(__DIR__ . '/params.php');
 
 $config = [
-    'id' => 'basic',
+    'id' => '颂唐OS',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'language' => 'zh_CN',
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => '26602a67be14ea8c',
+            'cookieValidationKey' => '26602a67be14ea8c123',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass' => 'app\models\UserIdentity',
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [

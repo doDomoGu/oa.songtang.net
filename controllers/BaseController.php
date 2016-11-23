@@ -7,7 +7,6 @@ use app\models\User;
 use yii\bootstrap\Html;
 use Yii;
 use yii\web\Controller;
-
 class BaseController extends Controller
 {
     public $user = false;       //用户对象
@@ -30,14 +29,14 @@ class BaseController extends Controller
             $this->viewName = $this->action->id;  //一般视图名就等于动作名  site/login => login.php
 
 
-            $this->setNavItems(); //设置导航栏
+            //$this->setNavItems(); //设置导航栏
 
             $this->isMobile = CommonFunc::isMobile(); //根据设备属性判断是否为移动用户
 
             //如果是移动设备
-            if($this->isMobile){
+            /*if($this->isMobile){
                 $this->layout = 'main_web';
-            }
+            }*/
 
             return true;
         }
@@ -47,20 +46,12 @@ class BaseController extends Controller
 
     //检测是否登陆  1.
     public function checkLogin(){
-        //判断是否用户登录
-        if(!Yii::$app->user->isGuest){
-
-            $this->user = User::find()->where(['id'=>Yii::$app->user->id])->one();
-            //检测用户的状态是否正常 ，否则强制退出，跳转至登录页面
-            if(!$this->user->status==User::STATUS_ENABLE){
-                Yii::$app->user->logout();
-                $this->toLogin();
-            }
-        }else{
+        if(Yii::$app->user->isGuest) {
             //用户未登录
             $except = [
                 'site/index',
                 'site/login',
+                'site/logout',
                 'site/rule',
                 'site/register',
                 'site/captcha',
@@ -70,7 +61,7 @@ class BaseController extends Controller
                 'site/test'
             ];
             //除了上述访问路径外，需要用户登录，跳转至登录页面
-            if(!in_array($this->route,$except)) {
+            if (!in_array($this->route, $except)) {
                 $this->toLogin();
             }
         }
@@ -126,38 +117,4 @@ class BaseController extends Controller
         $this->navItems = $items;
     }
 
-    /*public function isNavItemActive($url,$alias){
-        $return = false;
-        switch(true){
-            case ($alias == 'room':
-        }
-
-        return $return;
-    }*/
-
-    //获取登录用户的消息通知提醒
-    /*public function getMessageInfo(){
-        if(!Yii::$app->user->isGuest){
-            $this->message = MessageUser::find()->where(['send_to_id'=>yii::$app->user->id,'read_status'=>0])->all();
-            if(!empty($this->message)){
-                $this->messageNum = count($this->message);
-            }
-        }
-    }*/
-
-    public function addUserHistory(){
-        $new = new UserHistory();
-        $new->user_id = Yii::$app->user->isGuest?0:Yii::$app->user->id;
-        $new->url = Yii::$app->request->getAbsoluteUrl();
-        $new->controller = $this->id;
-        $new->action = $this->action->id;
-        $new->request = Yii::$app->request->queryString;
-        $new->request_method = Yii::$app->request->method;
-        $new->response = Yii::$app->response->statusCode;
-        $new->ip = Yii::$app->request->getUserIP();
-        $new->user_agent = Yii::$app->request->getUserAgent();
-        $new->referer = Yii::$app->request->getReferrer();
-        $new->add_time = date('Y-m-d H:i:s');
-        $new->save();
-    }
 }

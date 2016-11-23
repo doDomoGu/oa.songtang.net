@@ -8,10 +8,34 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
-use app\models\ContactForm;
 
 class SiteController extends BaseController
 {
+    public function behaviors(){
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['logout'/*,'register'*/],
+                'rules' => [
+                    /*[
+                        'actions' => ['register'],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],*/
+                    [
+                        'actions' => ['logout'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+            'verbs' => ['class' => VerbFilter::className(),
+                'actions' => [
+                    'logout' => ['post'],
+                ],
+            ],
+        ];
+    }
     public function actions()
     {
         return [
