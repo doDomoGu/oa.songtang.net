@@ -2,103 +2,88 @@
 
 namespace app\models;
 
-class User extends \yii\base\Object implements \yii\web\IdentityInterface
+use Yii;
+
+class User extends \yii\db\ActiveRecord
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
+    const SUPER_ADMIN = 1;
+    const USER_ADMIN = 2;
 
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
-
-    /**
-     * @inheritdoc
-     */
-    public static function findIdentity($id)
+    public static function getDb()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return Yii::$app->db2;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public static function findIdentityByAccessToken($token, $type = null)
-    {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAuthKey()
-    {
-        return $this->authKey;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
-     */
     public function validatePassword($password)
     {
-        return $this->password === $password;
+        return $this->password === md5($password);
+    }
+
+    public function attributeLabels(){
+        return [
+            'username' => '用户名(邮箱)',
+            'password' => '密码',
+            'reg_code' => '注册码',
+            'forgetpw_code' => '忘记密码验证码',
+            'name' => '姓名',
+            //'is_admin' => '是否为管理员',
+            'position_id' => '职位',
+            'gender' => '性别',
+            'birthday' => '生日',
+            'join_date' => '入职日期',
+            'contract_date' => '合同到期日期',
+            'mobile' => '联系手机',
+            'phone' => '联系电话',
+            'describe' => '其他备注',
+            'ord' => '排序',
+            'status' => '状态'
+        ];
+    }
+
+    public function rules()
+    {
+        return [
+            [['username', 'password', 'name', 'ord', 'status'], 'required'],
+            ['username','unique'],
+            [['id', 'ord', 'status', 'position_id', 'gender'], 'integer'],
+            ['username','email'],
+            ['username','unique','on'=>'create', 'targetClass' => 'app\models\User', 'message' => '此用户名已经被使用。'],
+            [['reg_code', 'forgetpw_code'],'default','value'=>''],
+            [['reg_code', 'forgetpw_code', 'birthday', 'join_date', 'contract_date', 'mobile', 'phone', 'describe','password_true'], 'safe']
+
+        ];
+    }
+
+/*CREATE TABLE `user` (
+`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+`username` varchar(100) NOT NULL,
+`password` varchar(100) NOT NULL,
+`reg_code` varchar(255) NOT NULL,
+`forgetpw_code` varchar(255) NOT NULL,
+`name` varchar(100) NOT NULL,
+`is_admin` tinyint(1) unsigned DEFAULT '0',
+`position_id` int(9) unsigned NOT NULL DEFAULT '0',
+`gender` tinyint(1) unsigned NOT NULL DEFAULT '0',
+`birthday` date DEFAULT NULL,
+`join_date` date DEFAULT NULL,
+`mobile` varchar(255) NOT NULL DEFAULT '',
+`phone` varchar(255) NOT NULL DEFAULT '',
+`describe` text NOT NULL,
+`ord` int(9) NOT NULL DEFAULT '0',
+`status` tinyint(1) NOT NULL DEFAULT '0',
+PRIMARY KEY (`id`),
+UNIQUE KEY `username_UNIQUE` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8*/
+
+
+    /*ALTER TABLE `user`
+     ADD `contract_date` DATE DEFAULT NULL AFTER `join_date`,
+     ADD `head_img` VARCHAR(255) DEFAULT NULL AFTER `contract_date`;*/
+
+    /*ALTER TABLE `user` ADD `password_true` VARCHAR(255) DEFAULT NULL AFTER `password`;*/
+
+    public function getPosition()
+    {
+        return $this->hasOne('app\models\Position', array('id' => 'position_id'));
     }
 }
