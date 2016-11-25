@@ -49,14 +49,12 @@ class BaseController extends Controller
         if(Yii::$app->user->isGuest) {
             //用户未登录
             $except = [
-                'site/index',
                 'site/login',
-                'site/logout',
-                'site/rule',
-                'site/register',
                 'site/captcha',
-                'site/register-send-sms',
                 'site/error',
+                /*'site/index',
+                'site/logout',*/
+
                 'site/send-test',
                 'site/test'
             ];

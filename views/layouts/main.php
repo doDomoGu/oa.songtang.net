@@ -69,7 +69,7 @@ AppAsset::register($this);
     <div class="container">
         <p class="pull-left">&copy; songtang.net <?= date('Y') ?></p>
 
-        <p class="pull-right">Powered by <a href="http://xinmengweb.com/" rel="external">Xinmeng Web</a></p>
+        <p class="pull-right"><a href="http://xinmengweb.com/" rel="external">Xinmeng Web</a></p>
     </div>
 </footer>
 
